@@ -141,6 +141,12 @@
     <Compile Include="Forms\FrmRegistrar.Designer.cs">
       <DependentUpon>FrmRegistrar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FrmReporteAmortizacion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmReporteAmortizacion.Designer.cs">
+      <DependentUpon>FrmReporteAmortizacion.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\FrmAmortizacion.resx">

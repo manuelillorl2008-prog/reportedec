@@ -10,11 +10,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Sistemas_de_Amortizacion.DAL; // for Cuotas
 
 namespace Sistemas_de_Prestamos.Forms
 {
     public partial class FrmAmortizacion : Form
     {
+        // Store last generated amortization so it can be reported
+        private List<AmortizacionDAL.Cuotas> amortizacionActual;
+
         public FrmAmortizacion()
         {
             InitializeComponent();
@@ -121,6 +125,10 @@ namespace Sistemas_de_Prestamos.Forms
                     txt_TEM.Text = (tem * 100).ToString("N2") + "%";
 
                     var ListaCuotas = guardar.GenerarCuotas(MontoDeseado, (double)tea, MesesFinales, FechaInicio);
+
+                    // store for reporting (ensure type matches AmortizacionDAL.Cuotas)
+                    amortizacionActual = ListaCuotas.Cast<AmortizacionDAL.Cuotas>().ToList();
+
                     dgv_Cuotas.DataSource = null;
                     dgv_Cuotas.DataSource = ListaCuotas;
 
@@ -232,6 +240,47 @@ namespace Sistemas_de_Prestamos.Forms
             }
         }
 
+        // Convert generated cuotas to a DataTable suitable for reporting
+        private DataTable GenerarDataTableDesdeCuotas(List<AmortizacionDAL.Cuotas> cuotas)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Mes", typeof(int));
+            dt.Columns.Add("FechaVencimiento", typeof(DateTime));
+            dt.Columns.Add("Cuota", typeof(decimal));
+            dt.Columns.Add("Interes", typeof(decimal));
+            dt.Columns.Add("Amortizacion", typeof(decimal));
+            dt.Columns.Add("Saldo", typeof(decimal));
+
+            if (cuotas == null) return dt;
+
+            foreach (var c in cuotas)
+            {
+                dt.Rows.Add(c.NumeroDeCuota, c.FechaVencimiento, c.MontoCuota, c.InteresCuota, c.AbonoCapital, c.SaldoRemanente);
+            }
+
+            return dt;
+        }
+
+        // Mostrar reporte simple en un nuevo formulario (tabla + exportar CSV)
+        private void Guardar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (amortizacionActual == null || amortizacionActual.Count == 0)
+                {
+                    MessageBox.Show("No hay datos de amortización para generar el reporte.", "Sin datos", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                DataTable dt = GenerarDataTableDesdeCuotas(amortizacionActual);
+                FrmReporteAmortizacion reporte = new FrmReporteAmortizacion(dt, txtbox_Nombre.Text);
+                reporte.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al generar reporte: " + ex.Message);
+            }
+        }
 
     }
 }
