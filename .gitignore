@@ -1,0 +1,20 @@
+# Ignorar paquetes NuGet
+packages/
+*.nupkg
+
+# Ignorar binarios y compilados
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+
+# Ignorar configuraciones temporales
+*.user
+*.suo
+*.cache
+*.log
+
+# Ignorar archivos de VS
+.vs/
+
